@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 
 
 app.use(express.json());
+mongoose.connect('mongodb://127.0.0.1:27017/myapp')
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log(err));
 
 app.get('/users', async (req, res) => {
     try {
@@ -24,10 +27,19 @@ app.post('/users', async (req, res) => {
     }
   });
 
+app.delete('/users/:id', async (req, res) => {
+    try {
+      const user = await User.findByIdAndDelete(req.params.id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
 
-mongoose.connect('mongodb://127.0.0.1:27017/myapp')
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.log(err));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
