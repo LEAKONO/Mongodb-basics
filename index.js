@@ -40,27 +40,24 @@ app.delete('/users/:id', async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   });
-  app.put('/users/:id', async (req, res) => {
+  // PUT route to update a user by ID
+app.put('/users/:id', async (req, res) => {
     try {
       const { name, email } = req.body;
-  
-      // Find the user by ID
-      const user = await User.findById(req.params.id);
+      const user = await User.findByIdAndUpdate(
+        req.params.id,
+        { name, email },
+        { new: true } // return the updated user
+      );
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
-  
-      // Update user fields if they are provided
-      if (name) user.name = name;
-      if (email) user.email = email;
-  
-      // Save the updated user
-      await user.save();
-      res.json({ message: 'User updated successfully', user });
+      res.json(user);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(400).json({ error: error.message });
     }
   });
+  
 
 
 const PORT = process.env.PORT || 5000;
